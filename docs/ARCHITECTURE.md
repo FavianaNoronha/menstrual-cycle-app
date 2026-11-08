@@ -6,7 +6,7 @@
                                         ├─ onboarding: language → consent (DPDP)
                                         ├─ voice note → Sarvam STT (code-mixed Indian languages)
                                         ├─ extraction: rule lexicon → (later) LLM with JSON schema → read-back
-                                        ├─ ritu_engine: prediction, norms, PBAC, cyclicity, pain, red flags
+                                        ├─ cycle_engine: prediction, norms, PBAC, cyclicity, pain, red flags
                                         └─ store: Postgres, field-level encryption (dev: memory)
 
  Android app (Flutter) ──► encrypted on-device DB ──sync──► services/api

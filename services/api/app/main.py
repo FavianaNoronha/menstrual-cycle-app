@@ -30,7 +30,7 @@ def create_app(settings: Settings | None = None, handler: ConversationHandler | 
             else None,
         )
 
-    app = FastAPI(title="Ritu API", version="0.1.0")
+    app = FastAPI(title="Cycle Companion API", version="0.1.0")
 
     @app.get("/health")
     def health() -> dict:

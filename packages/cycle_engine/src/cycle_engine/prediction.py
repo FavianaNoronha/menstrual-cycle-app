@@ -98,40 +98,39 @@ def predict_next_period(record: CycleRecord, typical_cycle_days: int | None = No
     )
 
 
-class Phase(str, Enum):
-    MENSTRUAL = "menstrual"
-    FOLLICULAR = "follicular"
-    OVULATORY_ESTIMATE = "ovulatory_estimate"
-    LUTEAL = "luteal"
-    PREMENSTRUAL = "premenstrual"  # last ~7 days before the next period
-    LATE = "late"  # past the latest predicted date
+class Window(str, Enum):
+    """Where a day sits relative to her own period dates.
+
+    Deliberately NOT hormonal phases. Counting days cannot tell whether or when
+    someone ovulated (BMJ analysis, Sept 2026), so we never say "luteal" or
+    "ovulatory". We only say how far a day is from her expected next period.
+    """
+
+    BLEEDING = "bleeding"
+    BEFORE_PERIOD = "before_period"  # the 7 days before the likely start
+    BETWEEN = "between"
+    OVERDUE = "overdue"  # past the latest predicted date
     UNKNOWN = "unknown"
 
 
-def estimate_phase(record: CycleRecord, day: date) -> Phase:
-    """Rough phase estimate from the calendar. Labelled an estimate everywhere in the UI.
+@dataclass(frozen=True)
+class CycleWindow:
+    window: Window
+    days_to_expected: int | None  # negative once past the likely date
 
-    The luteal phase is fairly stable (~14 days), so ovulation is estimated as
-    14 days before the likely next period. Without temperature or hormone data
-    this is a guess, and it is meaningless for people who don't ovulate.
-    """
+
+def cycle_window(record: CycleRecord, day: date) -> CycleWindow:
     last = record.last_period()
     if last is None or day < last.start:
-        return Phase.UNKNOWN
-    if last.contains(day) and (last.end is not None or (day - last.start).days < 8):
-        return Phase.MENSTRUAL
-
+        return CycleWindow(Window.UNKNOWN, None)
     pred = predict_next_period(record)
+    days_to = (pred.likely - day).days if pred else None
+    if last.contains(day) and (last.end is not None or (day - last.start).days < 8):
+        return CycleWindow(Window.BLEEDING, days_to)
     if pred is None:
-        return Phase.UNKNOWN
+        return CycleWindow(Window.UNKNOWN, None)
     if day > pred.latest:
-        return Phase.LATE
-
-    days_to_next = (pred.likely - day).days
-    if days_to_next <= 7:
-        return Phase.PREMENSTRUAL
-    if 12 <= days_to_next <= 16:
-        return Phase.OVULATORY_ESTIMATE
-    if days_to_next < 12:
-        return Phase.LUTEAL
-    return Phase.FOLLICULAR
+        return CycleWindow(Window.OVERDUE, days_to)
+    if days_to is not None and days_to <= 7:
+        return CycleWindow(Window.BEFORE_PERIOD, days_to)
+    return CycleWindow(Window.BETWEEN, days_to)

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/strings.dart';
 
-/// One day's quick log. Mirrors ritu_engine's FlowLog, PainLog and SymptomLog.
+/// One day's quick log. Mirrors cycle_engine's FlowLog, PainLog and SymptomLog.
 class DailyLog {
   DailyLog({
     required this.day,

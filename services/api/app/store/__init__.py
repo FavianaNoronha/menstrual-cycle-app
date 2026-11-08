@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Protocol
 
-from ritu_engine import CycleRecord
+from cycle_engine import CycleRecord
 
 
 @dataclass

@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from helpers import record_from_lengths
 
-from ritu_engine import FlowLog, Product, ProductUse, Saturation, Severity, check_cycle_norms, score_period
+from cycle_engine import FlowLog, Product, ProductUse, Saturation, Severity, check_cycle_norms, score_period
 
 
 def codes(findings):

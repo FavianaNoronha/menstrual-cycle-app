@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 
-from ritu_engine import CycleRecord, Period, Profile
+from cycle_engine import CycleRecord, Period, Profile
 
 
 def periods_from_lengths(start: date, lengths: list[int], bleed_days: int = 5) -> list[Period]:

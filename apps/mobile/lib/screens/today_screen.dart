@@ -5,7 +5,7 @@ import 'log_sheet.dart';
 import 'pain_relief_screen.dart';
 
 /// Home screen. Data is held in memory for now; the encrypted local store and
-/// sync with the Ritu API come next (see docs/ARCHITECTURE.md).
+/// sync with the Cycle Companion API come next (see docs/ARCHITECTURE.md).
 class TodayScreen extends StatefulWidget {
   const TodayScreen({super.key, required this.onLocaleChanged});
 

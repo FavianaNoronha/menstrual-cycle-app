@@ -1,4 +1,4 @@
-# Ritu Android app (Flutter)
+# Cycle Companion Android app (Flutter)
 
 Skeleton: today screen, quick log (period started, flow, pain 0–10, mood, cravings), "My cramps are bad" relief screen, and a language switcher for English, Hindi, Kannada, Telugu and Tamil.
 
@@ -7,7 +7,7 @@ Skeleton: today screen, quick log (period started, flow, pain 0–10, mood, crav
 ```bash
 # Install Flutter (stable): https://docs.flutter.dev/get-started/install
 cd apps/mobile
-flutter create . --org in.ritu --platforms android   # generates android/ without touching lib/
+flutter create . --org in.example.companion --platforms android   # generates android/ without touching lib/
 flutter pub get
 flutter run                                          # with an Android device or emulator connected
 ```

@@ -1,6 +1,6 @@
 # Red-flag rules (source of truth)
 
-Implemented in `packages/cycle_engine/src/ritu_engine/red_flags.py` and `pain.py`.
+Implemented in `packages/cycle_engine/src/cycle_engine/red_flags.py` and `pain.py`.
 **Status: DRAFT — every rule needs clinical advisor sign-off before launch.** Record the reviewer and date per rule.
 
 | Code | Trigger | Severity | User sees | Reviewed by / date |

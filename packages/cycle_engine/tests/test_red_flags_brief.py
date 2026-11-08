@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from helpers import record_from_lengths
 
-from ritu_engine import (
+from cycle_engine import (
     CycleRecord,
     FlowLog,
     Period,
@@ -15,7 +15,7 @@ from ritu_engine import (
     evaluate,
     render_text,
 )
-from ritu_engine.perimenopause import transition_hints
+from cycle_engine.perimenopause import transition_hints
 
 
 def test_soaking_hourly_is_urgent_and_sorted_first():
@@ -71,4 +71,4 @@ def test_brief_contains_questions_for_findings():
     assert brief["cycles_logged"] == 6
     assert any("vary a lot" in q for q in brief["questions_to_ask"])
     text = render_text(brief)
-    assert "RITU CYCLE SUMMARY" in text and "Questions to ask" in text
+    assert "CYCLE SUMMARY" in text and "Questions to ask" in text

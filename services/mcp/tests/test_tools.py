@@ -1,8 +1,8 @@
 import asyncio
 from datetime import date
 
-from ritu_mcp import tools
-from ritu_mcp.server import DemoSource, build_server
+from companion_mcp import tools
+from companion_mcp.server import DemoSource, build_server
 
 TODAY = date(2026, 11, 8)
 

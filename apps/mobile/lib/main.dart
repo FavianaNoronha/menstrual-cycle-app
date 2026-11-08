@@ -5,17 +5,17 @@ import 'l10n/strings.dart';
 import 'screens/today_screen.dart';
 
 void main() {
-  runApp(const RituApp());
+  runApp(const CompanionApp());
 }
 
-class RituApp extends StatefulWidget {
-  const RituApp({super.key});
+class CompanionApp extends StatefulWidget {
+  const CompanionApp({super.key});
 
   @override
-  State<RituApp> createState() => _RituAppState();
+  State<CompanionApp> createState() => _CompanionAppState();
 }
 
-class _RituAppState extends State<RituApp> {
+class _CompanionAppState extends State<CompanionApp> {
   Locale _locale = const Locale('en');
 
   void _setLocale(Locale locale) => setState(() => _locale = locale);
@@ -23,7 +23,7 @@ class _RituAppState extends State<RituApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ritu',
+      title: 'Cycle Companion',
       debugShowCheckedModeBanner: false,
       locale: _locale,
       supportedLocales: S.supported,

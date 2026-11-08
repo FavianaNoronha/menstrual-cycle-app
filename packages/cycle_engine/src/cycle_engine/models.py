@@ -89,6 +89,16 @@ class PainLocation(str, Enum):
     HEAD = "head"
 
 
+class Impact(str, Enum):
+    """What the pain stopped her doing (functional impact)."""
+
+    WORK = "work"
+    SCHOOL = "school"
+    SLEEP = "sleep"
+    EXERCISE = "exercise"
+    HOUSEWORK = "housework"
+
+
 @dataclass
 class PainLog:
     day: date
@@ -99,10 +109,40 @@ class PainLog:
     fever: bool = False
     fainted_or_dizzy: bool = False
     unusual_discharge: bool = False
+    duration_minutes: int | None = None  # how long the pain lasted that day, if she knows
+    nausea_vomiting: bool = False
+    impacts: set[Impact] = field(default_factory=set)  # activities she missed or couldn't do
 
     def __post_init__(self) -> None:
         if not 0 <= self.score <= 10:
             raise ValueError(f"pain score must be 0-10, got {self.score}")
+        if self.duration_minutes is not None and self.duration_minutes < 0:
+            raise ValueError("duration_minutes cannot be negative")
+
+
+@dataclass(frozen=True)
+class SleepLog:
+    day: date  # the morning the sleep is logged for
+    hours: float
+
+    def __post_init__(self) -> None:
+        if not 0 <= self.hours <= 24:
+            raise ValueError(f"sleep hours must be 0-24, got {self.hours}")
+
+
+@dataclass
+class Treatment:
+    """Something she started: a clinician-recommended medicine, therapy or a self-care habit.
+
+    The engine only compares what she logged before and after `started`. It never
+    suggests a treatment and never claims the treatment caused a change.
+    """
+
+    name: str
+    started: date
+    clinician_recommended: bool = False
+    stopped: date | None = None
+    side_effects: bool = False
 
 
 @dataclass
@@ -121,6 +161,8 @@ class CycleRecord:
     flow: list[FlowLog] = field(default_factory=list)
     symptoms: list[SymptomLog] = field(default_factory=list)
     pain: list[PainLog] = field(default_factory=list)
+    sleep: list[SleepLog] = field(default_factory=list)
+    treatments: list[Treatment] = field(default_factory=list)
     profile: Profile = field(default_factory=Profile)
     soaking_hourly_hours: int = 0  # hours in a row a pad was soaked within an hour (latest episode)
 

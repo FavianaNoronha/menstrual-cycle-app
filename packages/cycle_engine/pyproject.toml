@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ritu-engine"
+name = "cycle-engine"
 version = "0.1.0"
-description = "Cycle engine for Ritu: prediction, clinical norms, PBAC flow scoring, DRSP mood cyclicity, pain guidance and red-flag rules."
+description = "Cycle engine for Cycle Companion: prediction, clinical norms, PBAC flow scoring, DRSP mood cyclicity, pain guidance and red-flag rules."
 requires-python = ">=3.11"
 dependencies = []
 

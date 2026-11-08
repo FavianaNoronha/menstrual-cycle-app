@@ -11,12 +11,12 @@ from __future__ import annotations
 from datetime import date, timedelta
 from statistics import median
 
-from ritu_engine import (
+from cycle_engine import (
     CycleRecord,
     Severity,
     analyze_cyclicity,
     build_brief,
-    estimate_phase,
+    cycle_window,
     evaluate,
     predict_next_period,
     score_period,
@@ -35,7 +35,8 @@ def cycle_status(record: CycleRecord, today: date) -> dict:
     pred = predict_next_period(record)
     return {
         "cycle_day": record.cycle_day(today),
-        "phase_estimate": estimate_phase(record, today).value,
+        "window": cycle_window(record, today).window.value,
+        "days_to_expected_period": cycle_window(record, today).days_to_expected,
         "next_period": None
         if pred is None
         else {
@@ -44,7 +45,7 @@ def cycle_status(record: CycleRecord, today: date) -> dict:
             "latest": pred.latest.isoformat(),
             "confidence": pred.confidence.value,
         },
-        "note": "Phase is a calendar estimate; it is unreliable for irregular cycles or without ovulation.",
+        "note": "Windows are counted from her own period dates. They are not hormonal phases and say nothing about ovulation.",
         "not_a_diagnosis": True,
     }
 

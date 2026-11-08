@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from helpers import record_from_lengths
 
-from ritu_engine import Confidence, CycleRecord, Period, Phase, estimate_phase, predict_next_period
+from cycle_engine import Confidence, CycleRecord, Period, Window, cycle_window, predict_next_period
 
 
 def test_no_periods_returns_none():
@@ -41,11 +41,13 @@ def test_missed_period_gaps_are_not_used_as_cycle_lengths():
     assert pred.likely == rec.last_period().start + timedelta(days=28)
 
 
-def test_phase_estimates():
+def test_windows_are_relative_to_her_dates_not_hormonal_phases():
     rec = record_from_lengths([28, 28, 28, 28, 28, 28])
     start = rec.last_period().start
-    assert estimate_phase(rec, start + timedelta(days=1)) is Phase.MENSTRUAL
-    assert estimate_phase(rec, start + timedelta(days=8)) is Phase.FOLLICULAR
-    assert estimate_phase(rec, start + timedelta(days=14)) is Phase.OVULATORY_ESTIMATE
-    assert estimate_phase(rec, start + timedelta(days=23)) is Phase.PREMENSTRUAL
-    assert estimate_phase(rec, start + timedelta(days=40)) is Phase.LATE
+    assert cycle_window(rec, start + timedelta(days=1)).window is Window.BLEEDING
+    assert cycle_window(rec, start + timedelta(days=8)).window is Window.BETWEEN
+    assert cycle_window(rec, start + timedelta(days=14)).window is Window.BETWEEN  # no ovulation claim
+    w = cycle_window(rec, start + timedelta(days=23))
+    assert w.window is Window.BEFORE_PERIOD and w.days_to_expected == 5
+    assert cycle_window(rec, start + timedelta(days=40)).window is Window.OVERDUE
+    assert {m.value for m in Window}.isdisjoint({"luteal", "follicular", "ovulatory_estimate"})

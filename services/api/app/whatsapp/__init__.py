@@ -1,7 +1,7 @@
 """WhatsApp Business Platform (Cloud API) integration.
 
 Policy note: since 15 Jan 2026 Meta bans general-purpose AI assistants on the
-Business API. Ritu's bot must stay a scoped cycle-tracking service; anything
+Business API. The bot must stay a scoped cycle-tracking service; anything
 off-topic gets a polite refusal (see conversation handler).
 """
 
@@ -109,7 +109,7 @@ class CloudApiMessenger:
             "interactive": {
                 "type": "list",
                 "body": {"text": body[:1024]},
-                "action": {"button": button[:20], "sections": [{"title": "Ritu", "rows": [
+                "action": {"button": button[:20], "sections": [{"title": "Cycle Companion", "rows": [
                     {"id": i, "title": t[:24]} for i, t in rows[:10]
                 ]}]},
             },

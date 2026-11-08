@@ -1,9 +1,10 @@
-"""Ritu cycle engine."""
+"""Cycle Companion cycle engine."""
 
 from .brief import build_brief, render_text
 from .models import (
     CycleRecord,
     FlowLog,
+    Impact,
     PainLocation,
     PainLog,
     Period,
@@ -11,12 +12,14 @@ from .models import (
     ProductUse,
     Profile,
     Saturation,
+    SleepLog,
     SymptomLog,
+    Treatment,
 )
 from .norms import Finding, Severity, check_cycle_norms
-from .pain import SELF_CARE, pain_findings, relief_plan
+from .pain import SELF_CARE, pain_findings, relief_plan, treatment_response
 from .pbac import score_period
-from .prediction import Confidence, Phase, Prediction, estimate_phase, predict_next_period
+from .prediction import Confidence, CycleWindow, Prediction, Window, cycle_window, predict_next_period
 from .red_flags import evaluate
 from .symptoms import CORE_ITEMS, CRAVING_TYPES, PHYSICAL_ITEMS, analyze_cyclicity, top_cravings
 
@@ -24,6 +27,12 @@ __all__ = [
     "CORE_ITEMS",
     "CRAVING_TYPES",
     "Confidence",
+    "CycleWindow",
+    "Impact",
+    "SleepLog",
+    "Treatment",
+    "Window",
+    "treatment_response",
     "CycleRecord",
     "Finding",
     "FlowLog",
@@ -31,7 +40,6 @@ __all__ = [
     "PainLocation",
     "PainLog",
     "Period",
-    "Phase",
     "Prediction",
     "Product",
     "ProductUse",
@@ -43,7 +51,7 @@ __all__ = [
     "analyze_cyclicity",
     "build_brief",
     "check_cycle_norms",
-    "estimate_phase",
+    "cycle_window",
     "evaluate",
     "pain_findings",
     "predict_next_period",

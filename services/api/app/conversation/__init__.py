@@ -3,7 +3,7 @@
 Rules that keep us safe and policy-compliant:
 - Nothing health-related is stored before explicit consent (DPDP).
 - Every save is read back to the user ("Saved: ...") so extraction errors get caught.
-- Red flags come from ritu_engine.evaluate, never from a language model.
+- Red flags come from cycle_engine.evaluate, never from a language model.
 - Off-topic chat gets a scoped refusal (WhatsApp Business AI policy, Jan 2026).
 """
 
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
 
-from ritu_engine import (
+from cycle_engine import (
     FlowLog,
     PainLocation,
     PainLog,

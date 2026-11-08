@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 from helpers import record_from_lengths
 
-from ritu_engine import (
+from cycle_engine import (
     PainLocation,
     PainLog,
     Severity,

@@ -35,7 +35,7 @@ class S {
   }
 
   static const Map<String, Map<String, String>> _strings = {
-    'appTitle': {'en': 'Ritu', 'hi': 'रितु', 'kn': 'ರಿತು', 'te': 'రితు', 'ta': 'ரிது'},
+    'appTitle': {'en': 'Cycle Companion', 'hi': 'Cycle Companion', 'kn': 'Cycle Companion', 'te': 'Cycle Companion', 'ta': 'Cycle Companion'},
     'today': {'en': 'Today', 'hi': 'आज', 'kn': 'ಇಂದು', 'te': 'ఈ రోజు', 'ta': 'இன்று'},
     'cycleDay': {
       'en': 'Cycle day',
@@ -160,7 +160,7 @@ class S {
     },
     'language': {'en': 'Language', 'hi': 'भाषा', 'kn': 'ಭಾಷೆ', 'te': 'భాష', 'ta': 'மொழி'},
     'notDiagnosis': {
-      'en': 'Ritu helps you track. It does not diagnose.',
+      'en': 'This app helps you track. It does not diagnose.',
       'hi': 'रितु ट्रैक करने में मदद करती है। यह बीमारी का निदान नहीं करती।',
       'kn': 'ರಿತು ದಾಖಲಿಸಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ. ಇದು ರೋಗನಿರ್ಣಯ ಮಾಡುವುದಿಲ್ಲ.',
       'te': 'రితు ట్రాక్ చేయడంలో సహాయపడుతుంది. ఇది రోగ నిర్ధారణ చేయదు.',

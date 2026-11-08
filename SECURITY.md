@@ -1,6 +1,6 @@
 # Security and privacy
 
-Ritu handles menstrual and health data — among the most sensitive data a person has.
+Cycle Companion handles menstrual and health data — among the most sensitive data a person has.
 
 ## Rules for everyone working on this repo
 

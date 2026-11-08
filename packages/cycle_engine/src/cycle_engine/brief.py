@@ -27,6 +27,7 @@ QUESTIONS = {
     "painkillers_not_helping": "Painkillers don't help my period pain. What are the next options?",
     "pain_pattern_bowel_bladder_sex": "I get pain with bowel movements, urination or sex around periods. Could this be endometriosis?",
     "pain_outside_periods": "I have pelvic pain outside my periods. What could cause it?",
+    "pain_disrupting_daily_life": "My period pain stops me from working, studying or sleeping. What are the next options?",
     "pain_worsening": "My period pain is getting worse each cycle. Should we investigate?",
     "no_period_90_days": "I haven't had a period in over 3 months. What should we test?",
     "transition_early_signs": "Could these cycle changes be early perimenopause?",
@@ -67,13 +68,13 @@ def build_brief(record: CycleRecord, today: date) -> dict:
         else {"earliest": pred.earliest.isoformat(), "likely": pred.likely.isoformat(), "latest": pred.latest.isoformat()},
         "findings": [{"code": f.code, "severity": f.severity.value, "evidence": f.evidence} for f in findings],
         "questions_to_ask": [QUESTIONS[f.code] for f in findings if f.code in QUESTIONS],
-        "disclaimer": "Self-reported data summarised by Ritu. Not a diagnosis.",
+        "disclaimer": "Self-reported data summarised by Cycle Companion. Not a diagnosis.",
     }
 
 
 def render_text(brief: dict) -> str:
     lines = [
-        "RITU CYCLE SUMMARY (self-reported, not a diagnosis)",
+        "CYCLE SUMMARY (self-reported, not a diagnosis)",
         f"Generated {brief['generated_on']} | records from {brief['period_from'] or '-'}",
         "",
         f"Cycles logged: {brief['cycles_logged']}",
@@ -86,6 +87,22 @@ def render_text(brief: dict) -> str:
     pain = brief["pain"]
     if pain["cycles_with_pain_logs"]:
         lines.append(f"Peak pain by cycle (0-10): {pain['peak_pain_by_cycle']}")
+        t = pain["pain_days_by_timing"]
+        lines.append(f"Pain days: {t['before']} before periods, {t['during']} during, {t['outside']} outside periods")
+        if pain["typical_duration_minutes"] is not None:
+            lines.append(f"Typical pain duration: {pain['typical_duration_minutes']} minutes")
+        if pain["nausea_or_vomiting_rate"]:
+            lines.append(f"Nausea or vomiting with pain on {int(pain['nausea_or_vomiting_rate'] * 100)}% of pain days")
+        if pain["days_activity_missed"]:
+            lines.append("Pain stopped her: " + ", ".join(f"{k} ({v} days)" for k, v in pain["days_activity_missed"].items()))
+        for tr in pain["treatments"]:
+            if tr["status"] == "ok":
+                lines.append(
+                    f"{tr['treatment']} (started {tr['started']}): average peak pain {tr['average_peak_before']} -> "
+                    f"{tr['average_peak_after']} (observed, not proof of cause)"
+                )
+            else:
+                lines.append(f"{tr['treatment']} (started {tr['started']}): not enough cycles logged yet to compare")
         if pain["painkiller_helped_rate"] is not None:
             lines.append(f"Painkiller helped: {int(pain['painkiller_helped_rate'] * 100)}% of times taken")
     if brief["premenstrual_patterns"]:

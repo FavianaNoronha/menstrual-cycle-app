@@ -17,10 +17,10 @@ LANGUAGES = {
 
 MESSAGES: dict[str, dict[str, str]] = {
     "choose_language": {
-        "en": "Hi! I'm Ritu. Choose your language:\nभाषा चुनें · ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ · భాష ఎంచుకోండి · மொழியைத் தேர்ந்தெடுக்கவும்",
+        "en": "Hi! I'm your cycle companion. Choose your language:\nभाषा चुनें · ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ · భాష ఎంచుకోండి · மொழியைத் தேர்ந்தெடுக்கவும்",
     },
     "consent": {
-        "en": "Ritu saves your period, mood and pain logs to help you understand your cycle. Your data stays in India, is never sold or used for ads, and you can delete it anytime by sending DELETE. Do you agree?",
+        "en": "This service saves your period, mood and pain logs to help you understand your cycle. Your data stays in India, is never sold or used for ads, and you can delete it anytime by sending DELETE. Do you agree?",
         "hi": "रितु आपके पीरियड, मूड और दर्द की जानकारी सेव करती है ताकि आप अपना साइकिल समझ सकें। आपका डेटा भारत में रहता है, कभी बेचा नहीं जाता, और आप DELETE भेजकर इसे कभी भी मिटा सकती हैं। क्या आप सहमत हैं?",
         "kn": "ನಿಮ್ಮ ಚಕ್ರವನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ರಿತು ನಿಮ್ಮ ಮುಟ್ಟು, ಮನಸ್ಥಿತಿ ಮತ್ತು ನೋವಿನ ದಾಖಲೆಗಳನ್ನು ಉಳಿಸುತ್ತದೆ. ನಿಮ್ಮ ಡೇಟಾ ಭಾರತದಲ್ಲೇ ಇರುತ್ತದೆ, ಎಂದಿಗೂ ಮಾರಾಟವಾಗುವುದಿಲ್ಲ, ಮತ್ತು DELETE ಕಳುಹಿಸಿ ಯಾವಾಗ ಬೇಕಾದರೂ ಅಳಿಸಬಹುದು. ನೀವು ಒಪ್ಪುತ್ತೀರಾ?",
         "te": "మీ సైకిల్‌ను అర్థం చేసుకోవడానికి రితు మీ పీరియడ్, మూడ్, నొప్పి వివరాలను సేవ్ చేస్తుంది. మీ డేటా భారతదేశంలోనే ఉంటుంది, ఎప్పుడూ అమ్మబడదు, DELETE పంపి ఎప్పుడైనా తొలగించవచ్చు. మీరు అంగీకరిస్తారా?",
@@ -71,7 +71,7 @@ MESSAGES: dict[str, dict[str, str]] = {
         "ta": "உங்கள் சுழற்சி, அறிகுறிகள், மாதவிடாய் ஆரோக்கியத்தைப் பதிவுசெய்ய மட்டுமே என்னால் உதவ முடியும்.",
     },
     "deleted": {
-        "en": "All your Ritu data has been deleted.",
+        "en": "All your data has been deleted.",
         "hi": "आपका सारा रितु डेटा मिटा दिया गया है।",
         "kn": "ನಿಮ್ಮ ಎಲ್ಲಾ ರಿತು ಡೇಟಾವನ್ನು ಅಳಿಸಲಾಗಿದೆ.",
         "te": "మీ రితు డేటా మొత్తం తొలగించబడింది.",

@@ -1,7 +1,7 @@
-"""Ritu MCP server.
+"""Cycle Companion MCP server.
 
-Local dev (stdio, demo data):   ritu-mcp
-Claude Desktop config:          {"mcpServers": {"ritu": {"command": "ritu-mcp"}}}
+Local dev (stdio, demo data):   companion-mcp
+Claude Desktop config:          {"mcpServers": {"cycle-companion": {"command": "companion-mcp"}}}
 
 Production plan: remote streamable-HTTP server behind OAuth 2.1, where each
 access token maps to exactly one consenting user and a set of scopes
@@ -17,7 +17,7 @@ from typing import Protocol
 from mcp.server.mcpserver import MCPServer
 from mcp.types import ToolAnnotations
 
-from ritu_engine import CycleRecord, PainLog, Period, Profile, SymptomLog
+from cycle_engine import CycleRecord, PainLog, Period, Profile, SymptomLog
 
 from . import tools
 
@@ -52,10 +52,10 @@ class DemoSource:
 
 def build_server(source: RecordSource, today=lambda: datetime.now(IST).date()) -> MCPServer:
     server = MCPServer(
-        name="ritu",
-        title="Ritu cycle record",
+        name="cycle-companion",
+        title="Cycle Companion cycle record",
         instructions=(
-            "Ritu holds one woman's self-logged menstrual cycle record. Use these tools to answer questions "
+            "Cycle Companion holds one woman's self-logged menstrual cycle record. Use these tools to answer questions "
             "about her cycle, symptoms and what to discuss with a doctor. Never diagnose. If get_flags returns "
             "urgent or soon items, tell her the guidance exactly as written before anything else."
         ),
