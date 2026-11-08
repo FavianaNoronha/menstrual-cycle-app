@@ -9,6 +9,7 @@ description = "Cycle Companion backend: WhatsApp bot webhook, voice transcriptio
 requires-python = ">=3.11"
 dependencies = [
   "cycle-engine",          # install packages/cycle_engine first (see README)
+  "cryptography>=42",
   "fastapi>=0.110",
   "httpx>=0.27",
   "uvicorn>=0.29",

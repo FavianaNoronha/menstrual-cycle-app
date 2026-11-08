@@ -16,3 +16,11 @@ Rules:
 - No ad SDKs or marketing pixels in the app or on pages that carry health data.
 - "DELETE" (WhatsApp) / "Delete my data" (app) erases the record; backups purge within the documented window.
 - Breach: report to the Data Protection Board within 72 hours and inform affected users.
+
+
+## Storage as built (pilot)
+
+- `SqliteStore` encrypts each user's record with Fernet before writing. The phone number is not a column: rows are keyed by an HMAC of it and the number lives only inside the encrypted blob. De-duplication ids are stored hashed and purged after 7 days.
+- `STORE_KEY` lives outside the repo and the database host. Losing it loses all data; the store refuses to start with a wrong key rather than silently resetting users.
+- Sending DELETE removes the user's row. Backups must be encrypted with the same discipline and expire on a schedule so deletion is real.
+- Before a public launch: Postgres in an India region, key rotation, audit logging, and a breach-notification runbook (DPDP: 72 hours).

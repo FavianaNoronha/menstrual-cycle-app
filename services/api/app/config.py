@@ -16,6 +16,8 @@ class Settings:
     sarvam_api_key: str = ""
     sarvam_stt_model: str = "saaras:v3"
     timezone: str = "Asia/Kolkata"
+    database_path: str = ""  # empty = in-memory (dev only)
+    store_key: str = ""  # Fernet key; required when database_path is set
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -28,4 +30,6 @@ class Settings:
             sarvam_api_key=os.getenv("SARVAM_API_KEY", ""),
             sarvam_stt_model=os.getenv("SARVAM_STT_MODEL", "saaras:v3"),
             timezone=os.getenv("APP_TIMEZONE", "Asia/Kolkata"),
+            database_path=os.getenv("DATABASE_PATH", ""),
+            store_key=os.getenv("STORE_KEY", ""),
         )

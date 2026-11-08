@@ -14,6 +14,7 @@ from .config import Settings
 from .conversation import ConversationHandler
 from .speech import SarvamTranscriber
 from .store import MemoryStore
+from .store.sqlite import SqliteStore
 from .whatsapp import CloudApiMessenger, parse_webhook, verify_signature
 
 
@@ -21,7 +22,7 @@ def create_app(settings: Settings | None = None, handler: ConversationHandler | 
     settings = settings or Settings.from_env()
     if handler is None:
         handler = ConversationHandler(
-            store=MemoryStore(),
+            store=SqliteStore(settings.database_path, settings.store_key) if settings.database_path else MemoryStore(),
             messenger=CloudApiMessenger(
                 settings.whatsapp_access_token, settings.whatsapp_phone_number_id, settings.graph_api_version
             ),
