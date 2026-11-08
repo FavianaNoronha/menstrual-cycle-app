@@ -185,3 +185,32 @@ def test_duplicate_webhook_deliveries_are_processed_once():
     post(client, body)
     post(client, body)
     assert len(messenger.sent) == 1
+
+
+def test_pain_details_are_read_back_and_stored():
+    client, store, messenger = make()
+    onboard(client)
+    post(client, text("cramps 8/10 for 2 hours, vomited, missed work"))
+    saved = messenger.texts()[-1]
+    assert "lasted 120 min" in saved and "nausea or vomiting" in saved and "missed work" in saved
+    log = store.get_or_create("919900000001").record.pain[-1]
+    assert log.score == 8 and log.duration_minutes == 120 and log.nausea_vomiting
+    assert [i.value for i in log.impacts] == ["work"]
+
+
+def test_details_survive_the_ask_for_a_score():
+    client, store, messenger = make()
+    onboard(client)
+    post(client, text("bad cramps, couldn't sleep"))
+    post(client, text("7"))
+    log = store.get_or_create("919900000001").record.pain[-1]
+    assert log.score == 7 and [i.value for i in log.impacts] == ["sleep"]
+
+
+def test_sleep_hours_logged_once_per_day():
+    client, store, _ = make()
+    onboard(client)
+    post(client, text("slept 5 hours"))
+    post(client, text("slept 6 hours"))
+    sleep = store.get_or_create("919900000001").record.sleep
+    assert len(sleep) == 1 and sleep[0].hours == 6.0

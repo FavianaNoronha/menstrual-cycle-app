@@ -69,3 +69,32 @@ def test_log_plus_help_keeps_the_log():
 def test_lone_score():
     assert RuleExtractor.lone_score(" 6 ") == 6
     assert RuleExtractor.lone_score("6 days") is None
+
+
+def test_pain_details_are_extracted_in_english():
+    r = ex.extract("cramps 8/10 for 3 hours, vomited and missed work, couldn't sleep")
+    assert r.pain_score == 8 and r.pain_duration_minutes == 180
+    assert r.nausea_vomiting and r.pain_impacts == {"work", "sleep"}
+
+
+def test_minutes_and_all_day():
+    assert ex.extract("pain 45 minutes").pain_duration_minutes == 45
+    assert ex.extract("pain all day").pain_duration_minutes == 1440
+
+
+def test_hinglish_and_native_details():
+    r = ex.extract("pet dard bahut, ulti hui, office nahi gaya")
+    assert r.pain_mentioned and r.nausea_vomiting and "work" in r.pain_impacts
+    assert ex.extract("வலி, வாந்தி").nausea_vomiting
+    assert "school" in ex.extract("दर्द था, स्कूल नहीं गई").pain_impacts
+
+
+def test_sleep_hours_are_not_mistaken_for_pain_duration():
+    r = ex.extract("slept 5 hours, mild cramps")
+    assert r.sleep_hours == 5.0 and r.pain_duration_minutes is None
+    assert ex.extract("slept only 6.5 hrs").sleep_hours == 6.5
+
+
+def test_details_ignored_without_pain():
+    r = ex.extract("I vomited at work, feeling tired")
+    assert not r.nausea_vomiting and not r.pain_impacts

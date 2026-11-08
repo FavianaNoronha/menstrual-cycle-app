@@ -18,6 +18,18 @@ void main() {
     }
   });
 
+  test('new pain-detail strings exist in all five languages', () {
+    const keys = [
+      'painLasted', 'durShort', 'durHours', 'durLong', 'durAllDay', 'nausea', 'painStopped',
+      'impact_work', 'impact_school', 'impact_sleep', 'sleepLastNight', 'sleepLow', 'sleepMid', 'sleepGood', 'sleepHigh',
+    ];
+    for (final locale in S.supported) {
+      for (final key in keys) {
+        expect(S(locale).get(key), isNot(key), reason: '$key missing for ${locale.languageCode}');
+      }
+    }
+  });
+
   test('unknown keys fall back to the key', () {
     expect(S(const Locale('ta')).get('nope'), 'nope');
   });

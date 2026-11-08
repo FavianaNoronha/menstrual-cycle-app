@@ -13,10 +13,12 @@ from datetime import date, datetime, timedelta, timezone
 
 from cycle_engine import (
     FlowLog,
+    Impact,
     PainLocation,
     PainLog,
     Period,
     Severity,
+    SleepLog,
     SymptomLog,
     build_brief,
     evaluate,
@@ -160,12 +162,20 @@ class ConversationHandler:
                 kinds = f" ({', '.join(sorted(ex.craving_types))})" if ex.craving_types else ""
                 parts.append(t("cravings", lang) + kinds)
 
+        if ex.sleep_hours is not None:
+            rec.sleep = [s for s in rec.sleep if s.day != today] + [SleepLog(today, ex.sleep_hours)]
+            parts.append(t("sleep_hours", lang, hours=f"{ex.sleep_hours:g}"))
+
         if ex.pain_mentioned or ex.fever or ex.fainted_or_dizzy:
             pain = {
                 "locations": sorted(ex.pain_locations),
                 "fever": ex.fever,
                 "fainted_or_dizzy": ex.fainted_or_dizzy,
+                "duration_minutes": ex.pain_duration_minutes,
+                "nausea_vomiting": ex.nausea_vomiting,
+                "impacts": sorted(ex.pain_impacts),
             }
+            parts += self._pain_detail_labels(pain, lang)
             if ex.pain_score is None and ex.pain_mentioned:
                 user.pending["pain"] = pain
             else:
@@ -190,6 +200,17 @@ class ConversationHandler:
         self._check_flags(user)
 
     @staticmethod
+    def _pain_detail_labels(pain: dict, lang: str | None) -> list[str]:
+        """Read-back text for the extra pain details, so extraction mistakes get caught."""
+        labels = []
+        if pain.get("duration_minutes") is not None:
+            labels.append(t("pain_duration", lang, minutes=pain["duration_minutes"]))
+        if pain.get("nausea_vomiting"):
+            labels.append(t("nausea", lang))
+        labels += [t({"work": "missed_work", "school": "missed_school", "sleep": "poor_sleep"}[i], lang) for i in pain.get("impacts", [])]
+        return labels
+
+    @staticmethod
     def _add_pain(rec, day: date, score: int, pain: dict) -> None:
         rec.pain.append(
             PainLog(
@@ -198,6 +219,9 @@ class ConversationHandler:
                 locations={PainLocation(loc) for loc in pain["locations"]},
                 fever=pain["fever"],
                 fainted_or_dizzy=pain["fainted_or_dizzy"],
+                duration_minutes=pain.get("duration_minutes"),
+                nausea_vomiting=pain.get("nausea_vomiting", False),
+                impacts={Impact(i) for i in pain.get("impacts", [])},
             )
         )
 

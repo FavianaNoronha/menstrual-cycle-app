@@ -127,6 +127,12 @@ LABELS: dict[str, dict[str, str]] = {
     "anxiety": {"en": "anxious", "hi": "घबराहट", "kn": "ಆತಂಕ", "te": "ఆందోళన", "ta": "பதட்டம்"},
     "mood_swings": {"en": "mood swings", "hi": "मूड स्विंग", "kn": "ಮನಸ್ಥಿತಿ ಏರಿಳಿತ", "te": "మూడ్ మార్పులు", "ta": "மனநிலை மாற்றம்"},
     "energy_low": {"en": "tired", "hi": "थकान", "kn": "ಸುಸ್ತು", "te": "అలసట", "ta": "சோர்வு"},
+    "nausea": {"en": "nausea or vomiting", "hi": "मतली/उल्टी", "kn": "ವಾಕರಿಕೆ/ವಾಂತಿ", "te": "వికారం/వాంతి", "ta": "குமட்டல்/வாந்தி"},
+    "missed_work": {"en": "missed work", "hi": "काम छूटा", "kn": "ಕೆಲಸ ತಪ್ಪಿತು", "te": "పని మానేశాను", "ta": "வேலை தவறியது"},
+    "missed_school": {"en": "missed school or college", "hi": "स्कूल/कॉलेज छूटा", "kn": "ಶಾಲೆ/ಕಾಲೇಜು ತಪ್ಪಿತು", "te": "స్కూల్/కాలేజీ మానేశాను", "ta": "பள்ளி/கல்லூரி தவறியது"},
+    "poor_sleep": {"en": "pain disturbed sleep", "hi": "दर्द से नींद खराब", "kn": "ನೋವಿನಿಂದ ನಿದ್ರೆ ಹಾಳಾಯಿತು", "te": "నొప్పితో నిద్ర పట్టలేదు", "ta": "வலியால் தூக்கம் கெட்டது"},
+    "pain_duration": {"en": "lasted {minutes} min", "hi": "{minutes} मिनट तक", "kn": "{minutes} ನಿಮಿಷ", "te": "{minutes} నిమిషాలు", "ta": "{minutes} நிமிடம்"},
+    "sleep_hours": {"en": "slept {hours} h", "hi": "नींद {hours} घंटे", "kn": "ನಿದ್ರೆ {hours} ಗಂಟೆ", "te": "నిద్ర {hours} గంటలు", "ta": "தூக்கம் {hours} மணி"},
     "bloating": {"en": "bloating", "hi": "पेट फूलना", "kn": "ಹೊಟ್ಟೆ ಉಬ್ಬರ", "te": "కడుపు ఉబ్బరం", "ta": "வயிறு உப்புசம்"},
 }
 

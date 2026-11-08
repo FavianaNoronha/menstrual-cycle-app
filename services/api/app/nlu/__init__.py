@@ -32,6 +32,10 @@ EXTRACTION_SCHEMA = {
         "fever": {"type": "boolean"},
         "fainted_or_dizzy": {"type": "boolean"},
         "soaking_hourly": {"type": "boolean"},
+        "pain_duration_minutes": {"type": ["integer", "null"], "minimum": 0},
+        "nausea_vomiting": {"type": "boolean"},
+        "pain_impacts": {"type": "array", "items": {"enum": ["work", "school", "sleep"]}},
+        "sleep_hours": {"type": ["number", "null"], "minimum": 0, "maximum": 24},
     },
     "required": ["intent"],
 }
@@ -53,6 +57,10 @@ class Extraction:
     fainted_or_dizzy: bool = False
     soaking_hourly: bool = False
     wants_pain_help: bool = False
+    pain_duration_minutes: int | None = None
+    nausea_vomiting: bool = False
+    pain_impacts: set[str] = field(default_factory=set)  # subset of {"work", "school", "sleep"}
+    sleep_hours: float | None = None
 
     def has_log_content(self) -> bool:
         return any(
@@ -66,6 +74,7 @@ class Extraction:
                 self.fever,
                 self.fainted_or_dizzy,
                 self.soaking_hourly,
+                self.sleep_hours is not None,
             ]
         )
 
@@ -112,6 +121,10 @@ LEXICON: dict[str, list[str]] = {
     "fever": ["fever", "bukhar", "बुखार", "ಜ್ವರ", "జ్వరం", "காய்ச்சல்"],
     "faint": ["faint", "fainted", "dizzy", "chakkar", "चक्कर", "ತಲೆ ಸುತ್ತು", "కళ్లు తిరుగు", "தலைசுற்றல்", "மயக்கம்"],
     "soaking_hourly": ["every hour", "har ghante", "हर घंटे", "ಪ್ರತಿ ಗಂಟೆ", "ప్రతి గంట", "ஒவ்வொரு மணி"],
+    "nausea": ["nausea", "nauseous", "vomit", "vomited", "vomiting", "threw up", "feel sick", "ulti", "उल्टी", "मतली", "ವಾಂತಿ", "ವಾಕರಿಕೆ", "వాంతి", "వికారం", "வாந்தி", "குமட்டல்"],
+    "impact_work": ["missed work", "couldn't work", "could not work", "can't work", "cant work", "off from work", "office nahi", "काम नहीं कर", "ಕೆಲಸಕ್ಕೆ ಹೋಗಲಿಲ್ಲ", "పనికి వెళ్లలేదు", "வேலைக்கு போகவில்லை"],
+    "impact_school": ["missed school", "missed class", "missed college", "school nahi", "college nahi", "स्कूल नहीं", "कॉलेज नहीं", "ಶಾಲೆಗೆ ಹೋಗಲಿಲ್ಲ", "ಕಾಲೇಜಿಗೆ ಹೋಗಲಿಲ್ಲ", "స్కూల్‌కి వెళ్లలేదు", "కాలేజీకి వెళ్లలేదు", "பள்ளிக்கு போகவில்லை", "கல்லூரிக்கு போகவில்லை"],
+    "impact_sleep": ["couldn't sleep", "could not sleep", "can't sleep", "cant sleep", "no sleep", "woke up with pain", "neend nahi", "नींद नहीं", "ನಿದ್ರೆ ಬರಲಿಲ್ಲ", "నిద్ర పట్టలేదు", "தூக்கம் வரவில்லை"],
     "intensifier": ["very", "bahut", "too much", "बहुत", "ತುಂಬಾ", "చాలా", "மிகவும்", "ரொம்ப"],
 }
 
@@ -126,6 +139,9 @@ INTENTS: dict[str, list[str]] = {
 
 SCORE_RE = re.compile(r"(?<!\d)(10|[0-9])\s*(?:/|out of|by)\s*10\b")
 LONE_SCORE_RE = re.compile(r"^\s*(10|[0-9])\s*$")
+SLEEP_RE = re.compile(r"\bslept\s+(?:only\s+|just\s+|about\s+)?(\d{1,2}(?:\.\d)?)\s*(?:hours?|hrs?|h)\b")
+DURATION_HOURS_RE = re.compile(r"(?<!slept )(?<!slept only )(?<!\d)(\d{1,2}(?:\.\d)?)\s*(?:hours?|hrs?|h)\b")
+DURATION_MIN_RE = re.compile(r"(?<!\d)(\d{1,3})\s*(?:minutes?|mins?)\b")
 ROMAN_RE = re.compile(r"^[\x00-\x7f]+$")
 
 
@@ -188,6 +204,23 @@ class RuleExtractor:
                 ex.symptoms[item] = rating
         if "cravings" in ex.symptoms and rating == 5:
             ex.symptoms["cravings"] = 5
+
+        if m := SLEEP_RE.search(text):
+            hours = float(m.group(1))
+            if 0 <= hours <= 24:
+                ex.sleep_hours = hours
+        # Details below only mean something attached to a pain entry.
+        if ex.pain_mentioned:
+            ex.nausea_vomiting = _has(text, LEXICON["nausea"])
+            for kind in ("work", "school", "sleep"):
+                if _has(text, LEXICON[f"impact_{kind}"]):
+                    ex.pain_impacts.add(kind)
+            if m := DURATION_MIN_RE.search(text):
+                ex.pain_duration_minutes = int(m.group(1))
+            elif (m := DURATION_HOURS_RE.search(text)) and SLEEP_RE.search(text) is None:
+                ex.pain_duration_minutes = int(float(m.group(1)) * 60)
+            elif _has(text, ["all day", "whole day", "din bhar", "दिन भर"]):
+                ex.pain_duration_minutes = 24 * 60
 
         ex.fever = _has(text, LEXICON["fever"])
         ex.fainted_or_dizzy = _has(text, LEXICON["faint"])
