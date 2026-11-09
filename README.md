@@ -8,7 +8,7 @@
 
 | Path | What it is | Status |
 | --- | --- | --- |
-| `packages/cycle_engine` | Python engine: range prediction, FIGO cycle norms, PBAC flow scoring, PMS/mood cyclicity (incl. cravings), period-pain guide, pain timing/duration/impact, treatment before-and-after, red-flag rules, doctor brief | Working, 35 tests |
+| `packages/cycle_engine` | Python engine: range prediction, FIGO cycle norms, PBAC flow scoring, PMS/mood cyclicity (incl. cravings), period-pain guide, pain timing/duration/impact, treatment before-and-after, red-flag rules, doctor brief | Working, 45 tests; includes personal pain "function line" |
 | `services/api` | FastAPI backend: WhatsApp Cloud API webhook, onboarding + consent, 5-language bot, rule-based log extraction, Sarvam speech-to-text for voice notes | Working with encrypted SQLite store (or in-memory for dev), 41 tests |
 | `services/mcp` | MCP server (Python SDK 2.x) exposing read-only tools: cycle status, trends, flags, doctor brief | Working on demo data, 2 tests |
 | `apps/mobile` | Flutter Android app shell: today screen, quick log (flow, pain, mood, cravings), pain-relief screen, language switcher | Skeleton, checked in CI |

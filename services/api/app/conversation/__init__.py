@@ -22,6 +22,7 @@ from cycle_engine import (
     SymptomLog,
     build_brief,
     evaluate,
+    pain_plan,
     predict_next_period,
     render_text,
 )
@@ -70,6 +71,15 @@ class ConversationHandler:
             self.messenger.send_text(user.wa_id, t("deleted", user.language))
             return
 
+        command = text.strip().upper()
+        if command == "PLAN":
+            return self._send_plan(user)
+        if command == "DISCREET":
+            user.discreet = not user.discreet
+            self.store.save(user)
+            self.messenger.send_text(user.wa_id, t("discreet_on" if user.discreet else "discreet_off", user.language))
+            return
+
         if "pain" in user.pending and (score := self.extractor.lone_score(text)) is not None:
             return self._complete_pain(user, score)
 
@@ -91,6 +101,29 @@ class ConversationHandler:
                 self.messenger.send_text(user.wa_id, t("off_topic", user.language))
             case _:
                 self.messenger.send_text(user.wa_id, t("not_understood", user.language))
+        if ex.intent in ("log", "status", "greeting", "help"):
+            self._maybe_nudge(user)
+
+    # ---- pain plan and pre-period heads-up --------------------------------------
+    def _send_plan(self, user: User) -> None:
+        plan = pain_plan(user.record, self._today())
+        basis = t("line_basis_personal" if plan.line.source == "personal" else "line_basis_default", user.language)
+        parts = [t("plan_head", user.language, line=plan.line.score, basis=basis), t("plan_steps", user.language)]
+        if plan.repeats:
+            parts.append(t("plan_doctor", user.language))
+        self.messenger.send_text(user.wa_id, "".join(parts))
+
+    def _maybe_nudge(self, user: User) -> None:
+        """One heads-up per predicted period, sent alongside a normal reply (so no template is needed).
+        Discreet mode swaps the content for a neutral reminder; she reads it with PLAN."""
+        plan = pain_plan(user.record, self._today())
+        pred = predict_next_period(user.record)
+        if not plan.nudge_due or pred is None or user.nudged_for == pred.likely.isoformat():
+            return
+        user.nudged_for = pred.likely.isoformat()
+        self.store.save(user)
+        key = "nudge_discreet" if user.discreet else "nudge_intro"
+        self.messenger.send_text(user.wa_id, t(key, user.language, days=max(plan.days_to_expected or 0, 0)))
 
     # ---- onboarding ----------------------------------------------------------
     def _ask_language(self, user: User) -> None:

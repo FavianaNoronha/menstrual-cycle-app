@@ -18,6 +18,8 @@ class User:
     record: CycleRecord = field(default_factory=CycleRecord)
     pending: dict = field(default_factory=dict)  # follow-up questions in flight, e.g. pain score
     alerted_codes: set[str] = field(default_factory=set)  # urgent alerts already sent this episode
+    discreet: bool = False  # neutral wording for anything the bot sends unprompted (shared phones)
+    nudged_for: str | None = None  # predicted period date (ISO) the pre-period heads-up was last sent for
 
 
 class Store(Protocol):

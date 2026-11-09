@@ -91,6 +91,9 @@ def render_text(brief: dict) -> str:
         lines.append(f"Pain days: {t['before']} before periods, {t['during']} during, {t['outside']} outside periods")
         if pain["typical_duration_minutes"] is not None:
             lines.append(f"Typical pain duration: {pain['typical_duration_minutes']} minutes")
+        fl = pain["function_line"]
+        basis = "from her own logs" if fl["source"] == "personal" else "typical starting value, not yet personal"
+        lines.append(f"Pain level at which it starts to stop her daily activities: about {fl['score']}/10 ({basis})")
         if pain["nausea_or_vomiting_rate"]:
             lines.append(f"Nausea or vomiting with pain on {int(pain['nausea_or_vomiting_rate'] * 100)}% of pain days")
         if pain["days_activity_missed"]:

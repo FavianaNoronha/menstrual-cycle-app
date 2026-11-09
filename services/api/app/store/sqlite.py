@@ -68,6 +68,8 @@ class SqliteStore:
                 "record": record_to_data(user.record),
                 "pending": user.pending,
                 "alerted_codes": sorted(user.alerted_codes),
+                "discreet": user.discreet,
+                "nudged_for": user.nudged_for,
             }
         ).encode()
 
@@ -81,6 +83,8 @@ class SqliteStore:
             record=record_from_data(d["record"]),
             pending=d["pending"],
             alerted_codes=set(d["alerted_codes"]),
+            discreet=d.get("discreet", False),  # rows saved before these fields existed
+            nudged_for=d.get("nudged_for"),
         )
 
     # ---- Store protocol --------------------------------------------------------

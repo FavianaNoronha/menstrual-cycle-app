@@ -10,10 +10,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, timedelta
-from statistics import mean
+from statistics import mean, median
 
 from .models import CycleRecord, PainLocation, PainLog, Treatment
 from .norms import Finding, Severity
+from .prediction import Window, cycle_window
 
 
 @dataclass(frozen=True)
@@ -184,6 +185,55 @@ def treatment_response(record: CycleRecord, treatment: Treatment, min_cycles: in
     }
 
 
+# ---- her personal "function line" ----------------------------------------------
+# The pain score at which pain starts to stop HER doing things. Interference studies
+# put the moderate band around 5-6 and severe at 7+, but individual cut-offs vary
+# (some people lose function at 4, others at 8), so 6 is only a starting point that
+# her own logs replace. This is a planning aid, never a target to "tolerate more":
+# recurrent period pain is itself a reason to see a doctor.
+DEFAULT_LINE = 6
+MIN_CYCLES_FOR_PERSONAL = 2
+LINE_FLOOR, LINE_CEILING = 3, 9
+
+
+@dataclass(frozen=True)
+class FunctionLine:
+    score: int
+    source: str  # "default" or "personal"
+    cycles_used: int
+
+
+def function_line(record: CycleRecord) -> FunctionLine:
+    """Median, across cycles, of the lowest pain score on a day pain stopped her doing something."""
+    groups = [g for g in _pain_by_period(record) if g]
+    lowest = [min(l.score for l in g if l.impacts) for g in groups if any(l.impacts for l in g)]
+    if len(lowest) < MIN_CYCLES_FOR_PERSONAL:
+        return FunctionLine(DEFAULT_LINE, "default", len(lowest))
+    score = max(LINE_FLOOR, min(LINE_CEILING, round(median(lowest))))
+    return FunctionLine(score, "personal", len(lowest))
+
+
+@dataclass(frozen=True)
+class PainPlan:
+    line: FunctionLine
+    cycles_over_line: int  # of her last 3 cycles with pain logs, how many peaked at or above the line
+    cycles_considered: int
+    days_to_expected: int | None
+    repeats: bool  # at or above the line in 2+ recent cycles: suggest a doctor
+    nudge_due: bool  # 0-2 days before her expected period AND it repeats
+
+
+def pain_plan(record: CycleRecord, today: date) -> PainPlan:
+    """What the PLAN command shows, and when the bot adds a heads-up before her period."""
+    line = function_line(record)
+    groups = [g for g in _pain_by_period(record) if g][-3:]
+    over = sum(1 for g in groups if max(l.score for l in g) >= line.score)
+    repeats = over >= 2
+    cw = cycle_window(record, today)
+    due = repeats and cw.window is Window.BEFORE_PERIOD and cw.days_to_expected is not None and 0 <= cw.days_to_expected <= 2
+    return PainPlan(line, over, len(groups), cw.days_to_expected, repeats, due)
+
+
 def _sleep_on_bad_days(record: CycleRecord) -> dict | None:
     """Average sleep the night before high-pain days vs other days (needs 3+ of each)."""
     by_day = {s.day: s.hours for s in record.sleep}
@@ -217,6 +267,7 @@ def pain_summary(record: CycleRecord) -> dict:
         "nausea_or_vomiting_rate": _flag_rate(logs, "nausea_vomiting"),
         "days_activity_missed": impacts,
         "sleep_on_high_pain_days": _sleep_on_bad_days(record),
+        "function_line": function_line(record).__dict__,
         "treatments": [treatment_response(record, t) for t in record.treatments],
     }
 

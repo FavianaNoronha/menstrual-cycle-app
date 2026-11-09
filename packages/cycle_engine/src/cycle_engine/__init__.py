@@ -17,7 +17,7 @@ from .models import (
     Treatment,
 )
 from .norms import Finding, Severity, check_cycle_norms
-from .pain import SELF_CARE, pain_findings, relief_plan, treatment_response
+from .pain import SELF_CARE, FunctionLine, PainPlan, function_line, pain_findings, pain_plan, relief_plan, treatment_response
 from .pbac import score_period
 from .prediction import Confidence, CycleWindow, Prediction, Window, cycle_window, predict_next_period
 from .red_flags import evaluate
@@ -29,7 +29,9 @@ __all__ = [
     "CRAVING_TYPES",
     "Confidence",
     "CycleWindow",
+    "FunctionLine",
     "Impact",
+    "PainPlan",
     "SleepLog",
     "Treatment",
     "Window",
@@ -54,7 +56,9 @@ __all__ = [
     "check_cycle_norms",
     "cycle_window",
     "evaluate",
+    "function_line",
     "pain_findings",
+    "pain_plan",
     "predict_next_period",
     "relief_plan",
     "record_from_data",
