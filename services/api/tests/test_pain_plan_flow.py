@@ -45,14 +45,14 @@ def test_nudge_sent_once_per_predicted_period():
     client, _, m = _client(_before_period())
     post(client, text("hi"))
     post(client, text("hi"))
-    nudges = [b for b in m.texts() if "Heads-up" in b]
+    nudges = [b for b in m.texts() if "weather forecast" in b]
     assert len(nudges) == 1
 
 
 def test_no_nudge_mid_cycle():
     client, _, m = _client(FIRST + timedelta(days=28 * 3 + 12))
     post(client, text("hi"))
-    assert not any("Heads-up" in b for b in m.texts())
+    assert not any("weather forecast" in b for b in m.texts())
 
 
 def test_discreet_mode_toggles_and_neutralises_nudge():
@@ -62,7 +62,7 @@ def test_discreet_mode_toggles_and_neutralises_nudge():
     post(client, text("hi"))
     sent = m.texts()
     assert any("note is waiting" in b for b in sent)
-    assert not any("pain" in b.lower() and "Heads-up" in b for b in sent)
+    assert not any("weather forecast" in b for b in sent)
     post(client, text("discreet"))
     assert store.get_or_create(WA).discreet is False
 
@@ -81,3 +81,11 @@ def test_new_fields_survive_sqlite_round_trip_and_old_rows(tmp_path):
     old = json.loads(SqliteStore._pack(u))
     del old["discreet"], old["nudged_for"]
     assert SqliteStore._unpack(json.dumps(old).encode()).discreet is False
+
+
+def test_unprompted_nudge_never_says_period_or_pain():
+    from app.i18n import MESSAGES
+    for key in ("nudge_intro", "nudge_discreet"):
+        for lang, text in MESSAGES[key].items():
+            low = text.lower()
+            assert "period" not in low and "pain" not in low and "cramp" not in low, (key, lang)
