@@ -24,7 +24,7 @@ jobs:
           cache: true
       # The repo keeps only lib/, pubspec and tests; generate the Android shell here.
       - name: Generate Android platform files
-        run: flutter create --platforms=android --project-name companion_mobile --org in.cyclecompanion .
+        run: flutter create --platforms=android --project-name companion_mobile --org com.cyclecompanion .
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
