@@ -28,3 +28,15 @@ Before-and-after pain comparison is shown as an observed change in her own logs,
 - Starting a pain medicine early is mainstream guidance, but evidence for specific timing is modest; the message is a prompt, not an instruction.
 - If pain reaches her line in 2+ recent cycles, the plan suggests a doctor and offers BRIEF.
 - DISCREET mode swaps unprompted messages for a neutral reminder ("a note is waiting"). It never changes safety or red-flag messages, or read-backs she asked for.
+
+## Irregular cycles and prediction feedback
+
+- A cycle history is flagged irregular only with 3+ cycle lengths, and only if the longest and shortest differ by 9+ days or any is outside 21-38 days (FIGO normal interval). Two cycles are never called irregular.
+- For irregular histories the range is the full span she has actually had, not a percentile, and confidence is always LOW. We say so and suggest a doctor "can check for common causes like PCOS or thyroid". We never say she has either.
+- WRONG widens the range by 2 days per side per press, at most 3 presses, so a few taps cannot make the range meaningless. It is her feedback on the range, not a medical signal.
+- The note about a doctor is a prompt, not a diagnosis. Wording must be reviewed by the clinical advisor.
+
+## Data export and "did this help?"
+
+- EXPORT returns exactly what she logged, as CSV text. It adds no interpretation.
+- After PLAN and BRIEF we ask one question (1 yes / 2 a bit / 3 no). A "no" asks for a reason in her words (200 characters kept). Answers are stored with her record, deleted by DELETE, and only counts are ever reported (`python -m app.store.sqlite feedback`). This is product feedback, never a health signal.

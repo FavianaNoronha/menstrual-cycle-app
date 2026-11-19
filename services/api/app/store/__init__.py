@@ -20,6 +20,7 @@ class User:
     alerted_codes: set[str] = field(default_factory=set)  # urgent alerts already sent this episode
     discreet: bool = False  # neutral wording for anything the bot sends unprompted (shared phones)
     nudged_for: str | None = None  # predicted period date (ISO) the pre-period heads-up was last sent for
+    feedback: list[dict] = field(default_factory=list)  # {"kind","answer","day","why"?}; deleted with the user
 
 
 class Store(Protocol):
@@ -27,6 +28,7 @@ class Store(Protocol):
     def save(self, user: User) -> None: ...
     def delete(self, wa_id: str) -> None: ...
     def seen_message(self, message_id: str) -> bool: ...
+    def feedback_counts(self) -> dict[str, dict[str, int]]: ...
 
 
 class MemoryStore:
@@ -48,9 +50,22 @@ class MemoryStore:
     def exists(self, wa_id: str) -> bool:
         return wa_id in self._users
 
+    def feedback_counts(self) -> dict[str, dict[str, int]]:
+        return count_feedback(self._users.values())
+
     def seen_message(self, message_id: str) -> bool:
         """WhatsApp retries webhooks; process each message id once."""
         if message_id in self._seen:
             return True
         self._seen.add(message_id)
         return False
+
+
+def count_feedback(users) -> dict[str, dict[str, int]]:
+    """{"plan": {"yes": n, "a_bit": n, "no": n}, ...}. Counts only: no ids, no free text."""
+    counts: dict[str, dict[str, int]] = {}
+    for u in users:
+        for f in u.feedback:
+            bucket = counts.setdefault(f["kind"], {})
+            bucket[f["answer"]] = bucket.get(f["answer"], 0) + 1
+    return counts

@@ -32,6 +32,7 @@ class Prediction:
     confidence: Confidence
     cycles_used: int
     basis: str  # machine-readable explanation key for the UI
+    irregular: bool = False  # her cycles vary too much for a single date to mean much
 
 
 def _percentile(sorted_values: list[float], q: float) -> float:
@@ -45,6 +46,20 @@ def _percentile(sorted_values: list[float], q: float) -> float:
     hi = min(lo + 1, len(sorted_values) - 1)
     frac = pos - lo
     return sorted_values[lo] + (sorted_values[hi] - sorted_values[lo]) * frac
+
+
+IRREGULAR_SPREAD_DAYS = 9  # longest minus shortest cycle; ACOG/FIGO treat >7-9 days variation as irregular
+NORMAL_CYCLE_RANGE = (21, 38)  # FIGO 2018 normal inter-menstrual interval
+MISS_WIDEN_DAYS = 2  # each "prediction was wrong" press widens the range by this much per side
+MAX_MISS_WIDEN = 3  # at most 3 presses count, so a few taps can't make the range meaningless
+
+
+def is_irregular(lengths: list[int]) -> bool:
+    """3+ cycles that vary a lot or sit outside the normal 21-38 day interval."""
+    if len(lengths) < 3:
+        return False
+    return (max(lengths) - min(lengths) >= IRREGULAR_SPREAD_DAYS
+            or any(n < NORMAL_CYCLE_RANGE[0] or n > NORMAL_CYCLE_RANGE[1] for n in lengths))
 
 
 def predict_next_period(record: CycleRecord, typical_cycle_days: int | None = None) -> Prediction | None:
@@ -73,15 +88,24 @@ def predict_next_period(record: CycleRecord, typical_cycle_days: int | None = No
 
     values = sorted(float(n) for n in lengths)
     mid = median(values)
-    if len(values) >= 4:
+    irregular = is_irregular(lengths)
+    if irregular:
+        # Percentiles hide the extremes; for irregular cycles show everything she has actually had.
+        lo, hi = values[0], values[-1]
+        basis = "irregular_full_range"
+    elif len(values) >= 4:
         lo, hi = _percentile(values, 0.10), _percentile(values, 0.90)
         basis = "percentile_range"
     else:
         lo, hi = values[0] - 2, values[-1] + 2
         basis = "min_max_widened"
 
+    widen = MISS_WIDEN_DAYS * min(record.prediction_misses, MAX_MISS_WIDEN)
+    lo, hi = lo - widen, hi + widen
     spread = hi - lo
-    if len(values) >= 6 and spread <= 4:
+    if irregular or record.prediction_misses:
+        confidence = Confidence.LOW
+    elif len(values) >= 6 and spread <= 4:
         confidence = Confidence.HIGH
     elif len(values) >= 3 and spread <= 8:
         confidence = Confidence.MEDIUM
@@ -95,6 +119,7 @@ def predict_next_period(record: CycleRecord, typical_cycle_days: int | None = No
         confidence=confidence,
         cycles_used=len(values),
         basis=basis,
+        irregular=irregular,
     )
 
 

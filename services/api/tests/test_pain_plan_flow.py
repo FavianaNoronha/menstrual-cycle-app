@@ -36,7 +36,7 @@ def _before_period():
 def test_plan_command_shows_line_without_naming_a_drug():
     client, _, m = _client(_before_period())
     post(client, text("plan"))
-    body = m.texts()[-1]
+    body = m.texts()[-2]  # the last message is the "did this help?" question
     assert "/10" in body and "pharmacist" in body.lower() and "BRIEF" in body  # repeats -> doctor line
     assert not any(w in body.lower() for w in ("ibuprofen", "mefenamic", "meftal", "paracetamol", "mg"))
 

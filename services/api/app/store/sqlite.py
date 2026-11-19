@@ -23,7 +23,7 @@ from datetime import datetime
 from cryptography.fernet import Fernet, InvalidToken
 from cycle_engine import record_from_data, record_to_data
 
-from . import User
+from . import User, count_feedback
 
 SEEN_TTL_SECONDS = 7 * 24 * 3600
 
@@ -70,6 +70,7 @@ class SqliteStore:
                 "alerted_codes": sorted(user.alerted_codes),
                 "discreet": user.discreet,
                 "nudged_for": user.nudged_for,
+                "feedback": user.feedback,
             }
         ).encode()
 
@@ -85,6 +86,7 @@ class SqliteStore:
             alerted_codes=set(d["alerted_codes"]),
             discreet=d.get("discreet", False),  # rows saved before these fields existed
             nudged_for=d.get("nudged_for"),
+            feedback=d.get("feedback", []),
         )
 
     # ---- Store protocol --------------------------------------------------------
@@ -116,6 +118,11 @@ class SqliteStore:
         with self._lock:
             return self._db.execute("SELECT 1 FROM users WHERE id = ?", (self._index(wa_id),)).fetchone() is not None
 
+    def feedback_counts(self) -> dict[str, dict[str, int]]:
+        with self._lock:
+            rows = self._db.execute("SELECT blob FROM users").fetchall()
+        return count_feedback(self._unpack(self._fernet.decrypt(r[0])) for r in rows)
+
     def seen_message(self, message_id: str) -> bool:
         now = time.time()
         with self._lock:
@@ -133,5 +140,8 @@ if __name__ == "__main__":
 
     if sys.argv[1:] == ["genkey"]:
         print(Fernet.generate_key().decode())
+    elif sys.argv[1:2] == ["feedback"] and len(sys.argv) == 4:
+        # python -m app.store.sqlite feedback <db path> <STORE_KEY>: counts only, no ids or free text
+        print(json.dumps(SqliteStore(sys.argv[2], sys.argv[3]).feedback_counts(), indent=2))
     else:
-        print("usage: python -m app.store.sqlite genkey")
+        print("usage: python -m app.store.sqlite genkey | feedback <db> <key>")

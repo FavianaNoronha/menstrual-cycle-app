@@ -21,6 +21,7 @@ from cycle_engine import (
     SleepLog,
     SymptomLog,
     build_brief,
+    export_csv,
     evaluate,
     pain_plan,
     predict_next_period,
@@ -72,8 +73,20 @@ class ConversationHandler:
             return
 
         command = text.strip().upper()
+        helped = user.pending.get("helped")
+        if helped and "pain" not in user.pending:
+            if self._handle_helped(user, helped, text, command):
+                return
         if command == "PLAN":
-            return self._send_plan(user)
+            self._send_plan(user)
+            return self._ask_helped(user, "plan")
+        if command in ("WRONG", "GALAT"):
+            return self._prediction_wrong(user)
+        if command == "EXPORT":
+            return self._export(user)
+        if command == "PROMISE":
+            self.messenger.send_text(user.wa_id, t("promise", user.language))
+            return
         if command == "DISCREET":
             user.discreet = not user.discreet
             self.store.save(user)
@@ -95,6 +108,7 @@ class ConversationHandler:
                 self.messenger.send_text(user.wa_id, t("pain_help", user.language))
             case "brief":
                 self.messenger.send_text(user.wa_id, render_text(build_brief(user.record, self._today())))
+                self._ask_helped(user, "brief")
             case "greeting" | "help":
                 self.messenger.send_text(user.wa_id, t("welcome", user.language))
             case "off_topic":
@@ -103,6 +117,60 @@ class ConversationHandler:
                 self.messenger.send_text(user.wa_id, t("not_understood", user.language))
         if ex.intent in ("log", "status", "greeting", "help"):
             self._maybe_nudge(user)
+
+    # ---- feedback, irregular cycles, export ----------------------------------------
+    def _ask_helped(self, user: User, kind: str) -> None:
+        """One question after PLAN/BRIEF. The answer is one digit, so it works on any phone, in any language."""
+        user.pending["helped"] = {"kind": kind}
+        self.store.save(user)
+        self.messenger.send_text(user.wa_id, t("helped_q", user.language))
+
+    def _handle_helped(self, user: User, helped: dict, text: str, command: str) -> bool:
+        """Returns True if the message was an answer (or free-text reason) and has been consumed."""
+        if "why" in helped:  # she said "no" earlier; this message is the reason, in her own words
+            user.feedback[-1]["why"] = text.strip()[:200]
+            user.pending.pop("helped")
+            self.store.save(user)
+            self.messenger.send_text(user.wa_id, t("helped_thanks", user.language))
+            return True
+        answer = {"1": "yes", "2": "a_bit", "3": "no"}.get(command)
+        if answer is None:
+            user.pending.pop("helped")  # she moved on; don't hold the question open
+            self.store.save(user)
+            return False
+        user.feedback.append({"kind": helped["kind"], "answer": answer, "day": self._today().isoformat()})
+        if answer == "no":
+            user.pending["helped"] = {"kind": helped["kind"], "why": True}
+            self.store.save(user)
+            self.messenger.send_text(user.wa_id, t("helped_why", user.language))
+        else:
+            user.pending.pop("helped")
+            self.store.save(user)
+            self.messenger.send_text(user.wa_id, t("helped_thanks", user.language))
+        return True
+
+    def _prediction_wrong(self, user: User) -> None:
+        pred = predict_next_period(user.record)
+        if pred is None:
+            self.messenger.send_text(user.wa_id, t("status_unknown", user.language))
+            return
+        user.record.prediction_misses += 1
+        user.feedback.append({"kind": "prediction", "answer": "wrong", "day": self._today().isoformat()})
+        self.store.save(user)
+        self._status(user, prefix=t("wrong_ack", user.language))
+
+    def _export(self, user: User) -> None:
+        csv_text = export_csv(user.record)
+        self.messenger.send_text(user.wa_id, t("export_head", user.language))
+        chunk, size = [], 0
+        for line in csv_text.splitlines():
+            if size + len(line) > 3500:  # WhatsApp text limit is 4096
+                self.messenger.send_text(user.wa_id, "\n".join(chunk))
+                chunk, size = [], 0
+            chunk.append(line)
+            size += len(line) + 1
+        self.messenger.send_text(user.wa_id, "\n".join(chunk))
+        self.messenger.send_text(user.wa_id, t("export_foot", user.language))
 
     # ---- pain plan and pre-period heads-up --------------------------------------
     def _send_plan(self, user: User) -> None:
@@ -269,15 +337,15 @@ class ConversationHandler:
         user.alerted_codes.update(f.code for f in new_urgent + new_soon)
         self.store.save(user)
 
-    def _status(self, user: User) -> None:
+    def _status(self, user: User, prefix: str = "") -> None:
         pred = predict_next_period(user.record)
         today = self._today()
         if pred is None:
             self.messenger.send_text(user.wa_id, t("status_unknown", user.language))
             return
         fmt = lambda d: d.strftime("%d %b")  # noqa: E731
-        self.messenger.send_text(
-            user.wa_id,
-            t("status", user.language, cycle_day=user.record.cycle_day(today), likely=fmt(pred.likely),
-              earliest=fmt(pred.earliest), latest=fmt(pred.latest)),
-        )
+        text = prefix + t("status", user.language, cycle_day=user.record.cycle_day(today), likely=fmt(pred.likely),
+                          earliest=fmt(pred.earliest), latest=fmt(pred.latest))
+        if pred.irregular:
+            text += t("irregular_note", user.language)
+        self.messenger.send_text(user.wa_id, text)

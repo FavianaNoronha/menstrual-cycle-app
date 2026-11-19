@@ -165,6 +165,7 @@ class CycleRecord:
     treatments: list[Treatment] = field(default_factory=list)
     profile: Profile = field(default_factory=Profile)
     soaking_hourly_hours: int = 0  # hours in a row a pad was soaked within an hour (latest episode)
+    prediction_misses: int = 0  # times she told us "that prediction was wrong"; each widens the range
 
     def sorted_periods(self) -> list[Period]:
         return sorted(self.periods, key=lambda p: p.start)

@@ -19,7 +19,8 @@ from .models import (
 from .norms import Finding, Severity, check_cycle_norms
 from .pain import SELF_CARE, FunctionLine, PainPlan, function_line, pain_findings, pain_plan, relief_plan, treatment_response
 from .pbac import score_period
-from .prediction import Confidence, CycleWindow, Prediction, Window, cycle_window, predict_next_period
+from .export import export_csv
+from .prediction import Confidence, CycleWindow, Prediction, Window, cycle_window, is_irregular, predict_next_period
 from .red_flags import evaluate
 from .serialization import record_from_data, record_to_data
 from .symptoms import CORE_ITEMS, CRAVING_TYPES, PHYSICAL_ITEMS, analyze_cyclicity, top_cravings
@@ -44,6 +45,8 @@ __all__ = [
     "PainLog",
     "Period",
     "Prediction",
+    "is_irregular",
+    "export_csv",
     "Product",
     "ProductUse",
     "Profile",
