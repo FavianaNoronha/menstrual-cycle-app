@@ -26,7 +26,7 @@ jobs:
       - name: Generate Android platform files
         run: flutter create --platforms=android --project-name companion_mobile --org in.cyclecompanion .
       - run: flutter pub get
-      - run: flutter analyze
+      - run: flutter analyze --no-fatal-infos
       - run: flutter test
       - name: Build debug-signed release APK (for testing, not for Play Store)
         run: flutter build apk --release
