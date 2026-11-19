@@ -1,6 +1,6 @@
 # Cycle Companion Android app (Flutter)
 
-Skeleton: today screen, quick log (period started, flow, pain 0–10, mood, cravings), "My cramps are bad" relief screen, and a language switcher for English, Hindi, Kannada, Telugu and Tamil.
+Today screen with expected-date range (wide and low-confidence for irregular cycles, with a "this date is wrong" button), pain plan with personal function line, late-period help, CSV data export, quick log, quick log (period started, flow, pain 0–10, mood, cravings), "My cramps are bad" relief screen, and a language switcher for English, Hindi, Kannada, Telugu and Tamil.
 
 ## First-time setup
 
