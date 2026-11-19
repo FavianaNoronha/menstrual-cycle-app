@@ -88,9 +88,19 @@ LEXICON: dict[str, list[str]] = {
         "ಮುಟ್ಟು ಶುರು", "ಮುಟ್ಟು ಆಯಿತು", "ಪೀರಿಯಡ್ ಶುರು",
         "పీరియడ్ వచ్చింది", "నెలసరి వచ్చింది", "పీరియడ్ మొదలైంది",
         "மாதவிடாய் வந்தது", "பீரியட் வந்தது", "மாதவிடாய் தொடங்கியது",
+        # Everyday and coded words. UNVERIFIED: each needs a native speaker's OK (docs/product/period-words.md).
+        # Bare "mc"/"dates"/"dooram" are ambiguous, so only first-person phrases with a verb are listed.
+        "mc aayi", "mc aa gayi", "mc start", "mc started", "mc shuru", "my mc started", "got my mc",
+        "chums", "aunt flo", "aunt flo is here", "that time of the month", "tom started", "my dates started",
+        "dates aa gayi", "dates aaye", "dates start",
+        "mahina aa gaya", "mahina shuru", "mera mahina aa gaya", "kapde aaye", "kapde aa gaye",
+        "महीना आ गया", "महीना शुरू", "मेरा महीना आ गया", "कपड़े आ गए", "मासिक शुरू", "मासिक धर्म शुरू", "डेट्स आ गई",
+        "డేట్స్ వచ్చాయి", "నేను దూరం",
+        "டேட்ஸ் வந்தது", "நான் தூரம்", "வீட்டுக்கு தூரம்",
     ],
     "period_ended": [
         "period ended", "period over", "periods over", "period finished", "period khatam", "periods khatam",
+        "mc khatam", "mc over", "mc ho gayi khatam", "chums over", "dates khatam",
         "पीरियड खत्म", "पीरियड ख़त्म", "ಮುಟ್ಟು ಮುಗಿಯಿತು", "ಮುಟ್ಟು ಮುಗಿದಿದೆ",
         "పీరియడ్ అయిపోయింది", "నెలసరి అయిపోయింది", "மாதவிடாய் முடிந்தது", "பீரியட் முடிந்தது",
     ],

@@ -98,3 +98,20 @@ def test_sleep_hours_are_not_mistaken_for_pain_duration():
 def test_details_ignored_without_pain():
     r = ex.extract("I vomited at work, feeling tired")
     assert not r.nausea_vomiting and not r.pain_impacts
+
+
+def test_everyday_and_coded_words_for_period():
+    from app.nlu import RuleExtractor
+
+    ex = RuleExtractor()
+    for phrase in ["my mc started", "chums", "mera mahina aa gaya", "महीना आ गया", "நான் தூரம்", "డేట్స్ వచ్చాయి"]:
+        assert ex.extract(phrase).period_started, phrase
+    assert ex.extract("mc over").period_ended
+
+
+def test_ambiguous_words_alone_do_not_log_a_period():
+    from app.nlu import RuleExtractor
+
+    ex = RuleExtractor()
+    for phrase in ["mc", "dates", "the distance is far", "what are the dates for the exam"]:
+        assert not ex.extract(phrase).period_started, phrase
