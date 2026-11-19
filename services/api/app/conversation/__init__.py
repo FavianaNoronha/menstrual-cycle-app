@@ -106,6 +106,9 @@ class ConversationHandler:
                 self._status(user)
             case "pain_help":
                 self.messenger.send_text(user.wa_id, t("pain_help", user.language))
+            case "late":
+                self.messenger.send_text(user.wa_id, t("late", user.language))
+                self._status(user)
             case "brief":
                 self.messenger.send_text(user.wa_id, render_text(build_brief(user.record, self._today())))
                 self._ask_helped(user, "brief")

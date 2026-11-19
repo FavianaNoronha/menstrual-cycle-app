@@ -147,6 +147,18 @@ INTENTS: dict[str, list[str]] = {
     "greeting": ["hi", "hello", "hey", "namaste", "namaskara", "vanakkam", "start"],
 }
 
+# "Late" is a worry for many women, often because of a possible pregnancy. Matched loosely, answered neutrally.
+LATE_PHRASES = [
+    "period late", "period is late", "periods late", "periods are late", "late period", "missed period", "missed my period",
+    "missed periods", "period missed", "period not come", "period didn't come", "period hasn't come", "not got my period",
+    "haven't got my period", "mc late", "mc nahi aayi", "period nahi aaya", "period nahi aya", "periods nahi aaye",
+    "mahina nahi aaya", "mahina nahi aya", "dates late", "dates miss",
+    "पीरियड नहीं आया", "पीरियड लेट", "महीना नहीं आया", "माहवारी नहीं आई", "मासिक नहीं आया",
+    "ಮುಟ್ಟು ಆಗಿಲ್ಲ", "ಮುಟ್ಟು ತಡ", "ಪೀರಿಯಡ್ ಆಗಿಲ್ಲ", "ಪೀರಿಯಡ್ ತಡ",
+    "పీరియడ్ రాలేదు", "పీరియడ్ లేట్", "నెలసరి రాలేదు",
+    "மாதவிடாய் வரவில்லை", "பீரியட் வரவில்லை", "பீரியட் லேட்", "மாதவிடாய் தாமதம்",
+]
+
 SCORE_RE = re.compile(r"(?<!\d)(10|[0-9])\s*(?:/|out of|by)\s*10\b")
 LONE_SCORE_RE = re.compile(r"^\s*(10|[0-9])\s*$")
 SLEEP_RE = re.compile(r"\bslept\s+(?:only\s+|just\s+|about\s+)?(\d{1,2}(?:\.\d)?)\s*(?:hours?|hrs?|h)\b")
@@ -178,6 +190,9 @@ class RuleExtractor:
                 ex.intent = intent
                 return ex
         ex.wants_pain_help = _has(text, INTENTS["pain_help"])
+        if _has(text, LATE_PHRASES) and not _has(text, LEXICON["period_started"]):
+            ex.intent = "late"
+            return ex
         if _has(text, ["next period", "kab aayega", "when is my period"]):
             ex.intent = "status"
             return ex

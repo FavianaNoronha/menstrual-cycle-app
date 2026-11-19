@@ -177,3 +177,20 @@ def test_promise_command():
     client, _, m = _client([28, 28, 28])
     post(client, text("PROMISE"))
     assert "free, forever" in m.texts()[-1] and "EXPORT" in m.texts()[-1]
+
+
+def test_late_period_gets_neutral_calm_reply_with_test_and_emergency_advice():
+    client, _, m = _client([28, 28, 28])
+    post(client, text("my period is late"))
+    body = "\n".join(m.texts()).lower()
+    assert "very common" in body and "urine test" in body and "hospital now" in body
+    assert not any(w in body for w in ("unmarried", "single", "sex", "sin", "shame", "careless"))
+
+
+def test_late_phrases_in_other_languages_and_started_still_logs():
+    from app.nlu import RuleExtractor
+
+    ex = RuleExtractor()
+    for phrase in ["period nahi aaya", "पीरियड नहीं आया", "పీరియడ్ రాలేదు", "பீரியட் வரவில்லை", "mc late"]:
+        assert ex.extract(phrase).intent == "late", phrase
+    assert ex.extract("period started today").period_started

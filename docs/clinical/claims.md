@@ -40,3 +40,10 @@ Before-and-after pain comparison is shown as an observed change in her own logs,
 
 - EXPORT returns exactly what she logged, as CSV text. It adds no interpretation.
 - After PLAN and BRIEF we ask one question (1 yes / 2 a bit / 3 no). A "no" asks for a reason in her words (200 characters kept). Answers are stored with her record, deleted by DELETE, and only counts are ever reported (`python -m app.store.sqlite feedback`). This is product feedback, never a health signal.
+
+## Late period
+
+- Said as "my period is late / missed / nahi aaya", the bot answers calmly and without assumptions about her relationship or why she is asking. It never mentions marriage, sex or blame.
+- Content: lateness is common (stress, travel, illness, weight change, PCOS, thyroid); if pregnancy is possible a urine test works best from the day the period was due or later; see a doctor if more than 7 days late with a negative test or if it keeps happening; go to hospital now for severe (especially one-sided) belly pain, heavy bleeding or faintness (ectopic pregnancy and bleeding red flags).
+- NOT included yet, and need clinician and legal review before adding: emergency contraception, abortion access (MTP Act), pregnancy-test timing detail beyond the above. Do not add these from memory.
+- This is not a fertility feature: we do not predict ovulation or "safe days".
